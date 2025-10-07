@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {analyzeText} from "../services/api/polinationsClient";
+import { analyzeTextGemini } from '../services/api/googleClient';
 
 export default function CreatureScreen({ navigation }) {
     const [text, onChangeText] = useState('');
@@ -10,10 +10,16 @@ export default function CreatureScreen({ navigation }) {
         if (text.trim()) {
             console.log('Gesendet:', text);
             try {
-                const result = await analyzeText(text);
-                console.log('Antwort von Pollinations:', result);
+                const result = await analyzeTextGemini(text);
+                console.log('Antwort von Gemini:', result);
             } catch (error) {
-                console.error('Fehler:', error);
+                console.error('Gemini error:', error);
+                try {
+                    if (error && (error.raw || error.text)) {
+                        console.log('Gemini raw response:', error.raw);
+                        console.log('Gemini response text:', error.text);
+                    }
+                } catch {}
             }
             onChangeText('');
         }
