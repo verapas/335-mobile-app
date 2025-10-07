@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import RootNavigator from './src/navigation/RootNavigator';
-import { initializeDatabase, insertCreature, insertAnimations, setCreatureWords } from './src/services/db';
+import { initializeDatabase, insertCreature, insertAnimations, setCreatureWords, setCreatureProsody } from './src/services/db';
 import creatures from './src/data/creatures';
 import animations from './src/data/animations';
 import words from './src/data/words';
+import prosody from './src/data/prosody';
 
 export default function App() {
   useEffect(() => {
@@ -25,6 +26,13 @@ export default function App() {
           for (const entry of words) {
             if (entry?.creature_id && Array.isArray(entry.words)) {
               await setCreatureWords(entry.creature_id, entry.words);
+            }
+          }
+        }
+        if (Array.isArray(prosody) && prosody.length) {
+          for (const p of prosody) {
+            if (p?.creature_id && p?.prosody) {
+              await setCreatureProsody(p.creature_id, p.prosody);
             }
           }
         }

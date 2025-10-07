@@ -10,7 +10,7 @@ const DEFAULT_MODEL = extra.GEMINI_MODEL || 'gemini-2.5-flash';
 function buildPrompt(userText) {
   return (
     'Return only "emotion":"...","duration":"..." (lowercase). ' +
-    'emotion ∈excited, calm, sad, angry, neutral from tone; ' +
+    'emotion ∈excited, calm, sad, angry, neutral, happy from tone; ' +
     'duration ∈very short, short, middle, long, very long from intent (not input length). ' +
     'INPUT: ' + userText
   );

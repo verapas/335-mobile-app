@@ -14,6 +14,7 @@ export const Emotion = Object.freeze({
   Sad: 'sad',
   Angry: 'angry',
   Neutral: 'neutral',
+  Happy: 'happy',
 });
 
 function randInt(min, max) {
@@ -24,11 +25,13 @@ function chooseEndPunctuation(emotion) {
   const e = String(emotion || '').toLowerCase();
   switch (e) {
     case Emotion.Excited:
-      return Math.random() < 0.6 ? '!' : (Math.random() < 0.2 ? '!!' : '.');
+      return Math.random() < 0.55 ? '!' : (Math.random() < 0.25 ? '!!' : '.');
+    case Emotion.Happy:
+      return Math.random() < 0.35 ? '!' : '.';
     case Emotion.Angry:
-      return Math.random() < 0.5 ? '!' : (Math.random() < 0.2 ? '!!' : '.');
+      return Math.random() < 0.5 ? '!' : (Math.random() < 0.25 ? '!!' : '.');
     case Emotion.Sad:
-      return Math.random() < 0.4 ? '...' : '.';
+      return Math.random() < 0.6 ? '...' : '.';
     case Emotion.Calm:
       return '.';
     case Emotion.Neutral:
@@ -55,12 +58,31 @@ function wordsRangeForDuration(duration) {
   }
 }
 
-function maybeInsertSeparator(i, total) {
-  if (i === total - 1) return ''; // no separator after last word (handled by end punctuation)
-  // 20% chance to add a comma, 5% chance to add a question mark mid-sentence (rare), otherwise space
+function maybeInsertSeparator(i, total, emotion) {
+  if (i === total - 1) return '';
+  const e = String(emotion || '').toLowerCase();
   const r = Math.random();
+  // Tune punctuation density by emotion
+  if (e === Emotion.Sad || e === Emotion.Calm) {
+    // slower, more pauses
+    if (r < 0.35) return ',';
+    if (r < 0.37) return '...';
+    return '';
+  }
+  if (e === Emotion.Excited || e === Emotion.Angry) {
+    // faster, less commas, sometimes exclamation mid-stream
+    if (r < 0.08) return '!';
+    if (r < 0.12) return '-';
+    return '';
+  }
+  if (e === Emotion.Happy) {
+    if (r < 0.15) return ',';
+    if (r < 0.18) return '!';
+    return '';
+  }
+  // neutral
   if (r < 0.2) return ',';
-  if (r < 0.25) return '?';
+  if (r < 0.23) return '?';
   return '';
 }
 
@@ -75,7 +97,7 @@ export async function generateText({ creatureId, emotion, duration }) {
   let parts = [];
   for (let i = 0; i < count; i++) {
     const w = list[randInt(0, list.length - 1)] || '';
-    const sep = maybeInsertSeparator(i, count);
+    const sep = maybeInsertSeparator(i, count, emotion);
     parts.push(w + (sep ? sep : ''));
   }
 
@@ -87,4 +109,3 @@ export async function generateText({ creatureId, emotion, duration }) {
 }
 
 export default { generateText, Duration, Emotion };
-

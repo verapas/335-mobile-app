@@ -2,16 +2,44 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { analyzeTextGemini } from '../services/api/googleClient';
+import { getSelectedCreatureId, getEffectiveProsody } from '../services/creatureService';
+import { speakText, isSpeaking, stop as stopTTS } from '../services/audio/tts';
+import { generateText } from '../services/textGenerator';
 
 export default function CreatureScreen({ navigation }) {
     const [text, onChangeText] = useState('');
+    const [generated, setGenerated] = useState('');
 
+
+    // aktuell nur zum testen der ausgaben
     const handleSend = async () => {
         if (text.trim()) {
             console.log('Gesendet:', text);
             try {
                 const result = await analyzeTextGemini(text);
                 console.log('Antwort von Gemini:', result);
+
+                let creatureId = await getSelectedCreatureId();
+                if (!creatureId) {
+                    creatureId = 1; // fallback: first creature
+                }
+                const out = await generateText({
+                    creatureId,
+                    emotion: result.emotion,
+                    duration: result.duration,
+                });
+                setGenerated(out);
+                console.log('Generated text:', out);
+
+                try {
+                    const { pitch, rate } = await getEffectiveProsody(creatureId, result.emotion);
+                    if (await isSpeaking()) {
+                        stopTTS();
+                    }
+                    speakText({ text: out, pitch, rate, language: 'de-DE' });
+                } catch (e2) {
+                    console.warn('TTS error:', e2);
+                }
             } catch (error) {
                 console.error('Gemini error:', error);
                 try {

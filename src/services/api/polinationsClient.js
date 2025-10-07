@@ -1,9 +1,9 @@
-const BASE_URL = 'https://text.pollinations.ai';
+﻿const BASE_URL = 'https://text.pollinations.ai';
 
 export async function analyzeText(userText) {
     if (!userText) throw new Error('userText required');
 
-    const prompt = `{Return only {"emotion":"...","duration":"..."} (lowercase). emotion ∈ {excited, calm, sad, angry, neutral} from tone; duration ∈ {very short, short, middle, long, very long} from intent (not input length). INPUT: {{${userText}}}}`;
+    const prompt = `{Return only {"emotion ∈ {excited, calm, sad, angry, neutral, happy} from tone; duration âˆˆ {very short, short, middle, long, very long} from intent (not input length). INPUT: {{${userText}}}}`;
 
     const encodedPrompt = encodeURIComponent(prompt)
         .replace(/%3A/g, ':')

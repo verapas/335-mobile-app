@@ -16,6 +16,14 @@ async function ensureWordsColumn(db) {
   }
 }
 
+async function ensureProsodyColumn(db) {
+  const cols = await db.getAllAsync(`PRAGMA table_info(creatures);`);
+  const has = cols?.some?.((c) => c?.name === 'prosody_json');
+  if (!has) {
+    await db.runAsync(`ALTER TABLE creatures ADD COLUMN prosody_json TEXT;`);
+  }
+}
+
 export async function initializeDatabase() {
   const db = await getDb();
   await db.withTransactionAsync(async () => {
@@ -27,6 +35,7 @@ export async function initializeDatabase() {
       prosody_rate INTEGER
     );`);
     await ensureWordsColumn(db);
+    await ensureProsodyColumn(db);
     await db.runAsync(`CREATE TABLE IF NOT EXISTS animations (
       id INTEGER PRIMARY KEY NOT NULL,
       creature_id INTEGER UNIQUE,
@@ -121,4 +130,18 @@ export async function getWords(creatureId) {
   await ensureWordsColumn(db);
   const row = await db.getFirstAsync('SELECT words_json FROM creatures WHERE id = ?;', [creatureId]);
   return row?.words_json ? JSON.parse(row.words_json) : [];
+}
+
+export async function setCreatureProsody(creatureId, prosodyMap) {
+  const db = await getDb();
+  const json = JSON.stringify(prosodyMap || {});
+  await ensureProsodyColumn(db);
+  await db.runAsync('UPDATE creatures SET prosody_json = ? WHERE id = ?;', [json, creatureId]);
+}
+
+export async function getCreatureProsody(creatureId) {
+  const db = await getDb();
+  await ensureProsodyColumn(db);
+  const row = await db.getFirstAsync('SELECT prosody_json FROM creatures WHERE id = ?;', [creatureId]);
+  return row?.prosody_json ? JSON.parse(row.prosody_json) : {};
 }
