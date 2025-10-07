@@ -9,6 +9,8 @@ const images = {
   'bottolino/neutral_open': require('../images/Bottolino/neutral_open.png'),
   'bottolino/sad_closed': require('../images/Bottolino/sad_closed.png'),
   'bottolino/sad_open': require('../images/Bottolino/sad_open.png'),
+  'bottolino/angry_closed': require('../images/Bottolino/angry_closed.png'),
+  'bottolino/angry_open': require('../images/Bottolino/angry_open.png'),
 };
 
 export default images;

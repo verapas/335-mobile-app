@@ -1,14 +1,71 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+﻿import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { analyzeTextGemini } from '../services/api/googleClient';
-import { getSelectedCreatureId, getEffectiveProsody } from '../services/creatureService';
+import { getSelectedCreatureId, getEffectiveProsody, setCurrentEmotion } from '../services/creatureService';
+import { getCreatureWithAnimations, getCreatures } from '../services/db';
+import images from '../assets/registry/creatureImages';
 import { speakText, isSpeaking, stop as stopTTS } from '../services/audio/tts';
 import { generateText } from '../services/textGenerator';
 
 export default function CreatureScreen({ navigation }) {
     const [text, onChangeText] = useState('');
     const [generated, setGenerated] = useState('');
+    const [anim, setAnim] = useState(null);
+    const [speaking, setSpeaking] = useState(false);
+    const [mouthOpen, setMouthOpen] = useState(false);
+    const [emotion, setEmotion] = useState('neutral');
+
+    useFocusEffect(
+        React.useCallback(() => {
+            let active = true;
+            (async () => {
+                try {
+                    let id = await getSelectedCreatureId();
+                    if (!id) {
+                        const list = await getCreatures();
+                        id = list?.[0]?.id;
+                    }
+                    if (!id) { if (active) setAnim(null); return; }
+                    const data = await getCreatureWithAnimations(id);
+                    if (active) {
+                        setAnim(data?.animations || null);
+                        setEmotion('neutral');
+                        setMouthOpen(false);
+                    }
+                } catch (e) {
+                    console.warn('Load creature anim error:', e);
+                }
+            })();
+            return () => { active = false; };
+        }, [])
+    );
+
+    useEffect(() => {
+        let mounted = true;
+        const interval = setInterval(async () => {
+            try {
+                const sp = await isSpeaking();
+                if (!mounted) return;
+                setSpeaking(sp);
+                if (sp) setMouthOpen((m) => !m); else setMouthOpen(false);
+            } catch {}
+        }, 350);
+        return () => { mounted = false; clearInterval(interval); };
+    }, []);
+
+    const currentImage = useMemo(() => {
+        if (!anim) return null;
+        const pickKey = (key) => (key && images[key]) ? images[key] : null;
+        if (!speaking) return pickKey(anim.neutral_mouth_closed);
+        const emo = emotion;
+        const openField = `${emo}_mouth_open`;
+        const closedField = `${emo}_mouth_closed`;
+        const openSrc = pickKey(anim[openField]) || pickKey(anim.neutral_mouth_open);
+        const closeSrc = pickKey(anim[closedField]) || pickKey(anim.neutral_mouth_closed);
+        return mouthOpen ? openSrc : closeSrc;
+    }, [anim, speaking, mouthOpen, emotion]);
 
 
     // aktuell nur zum testen der ausgaben
@@ -36,7 +93,23 @@ export default function CreatureScreen({ navigation }) {
                     if (await isSpeaking()) {
                         stopTTS();
                     }
-                    speakText({ text: out, pitch, rate, language: 'de-DE' });
+                    setEmotion(String(result.emotion || 'neutral').toLowerCase());
+                    await setCurrentEmotion(result.emotion);
+                    speakText({
+                        text: out,
+                        pitch,
+                        rate,
+                        language: 'de-DE',
+                        onStart: () => { setSpeaking(true); setMouthOpen(true); },
+                        onDone: async () => {
+                            try { await setCurrentEmotion(null); } catch {}
+                            setSpeaking(false); setMouthOpen(false); setEmotion('neutral');
+                        },
+                        onStopped: async () => {
+                            try { await setCurrentEmotion(null); } catch {}
+                            setSpeaking(false); setMouthOpen(false); setEmotion('neutral');
+                        }
+                    });
                 } catch (e2) {
                     console.warn('TTS error:', e2);
                 }
@@ -55,6 +128,11 @@ export default function CreatureScreen({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+            <KeyboardAvoidingView
+                style={styles.container}
+                behavior={'height'}
+                keyboardVerticalOffset={0}
+            >
             <View style={styles.container}>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.headerBtn}>
@@ -62,7 +140,9 @@ export default function CreatureScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.content}>
-                    <Text style={styles.title}>Hier kommen die Creatures...</Text>
+                    {currentImage ? (
+                        <Image source={currentImage} style={styles.creatureImage} resizeMode="contain" />
+                    ) : null}
                 </View>
 
                 <View style={styles.inputContainer}>
@@ -80,6 +160,7 @@ export default function CreatureScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
             </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
@@ -94,7 +175,7 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        paddingTop: 40,
+        paddingTop: 16,
         paddingHorizontal: 16,
     },
     header: {
@@ -118,7 +199,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
     },
-    title: { fontSize: 28, fontWeight: '600', marginTop: 40 },
     inputContainer: {
         flexDirection: 'row',
         paddingHorizontal: 16,
@@ -148,4 +228,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
     },
+    creatureImage: { width: '80%', marginTop: -60, alignSelf: 'center' },
 });

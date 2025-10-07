@@ -11,6 +11,8 @@ const animations = [
     happy_mouth_closed: 'bottolino/happy_closed',
     calm_mouth_open: 'bottolino/calm_open',
     calm_mouth_closed: 'bottolino/calm_closed',
+    angry_mouth_open: 'bottolino/angry_open',
+    angry_mouth_closed: 'bottolino/angry_closed',
   },
 ];
 

@@ -1,5 +1,5 @@
 import images from '../assets/registry/creatureImages';
-import { getCreatureWithAnimations, getWords as dbGetWords, setCreatureWords as dbSetCreatureWords, getSelectedCreatureId as dbGetSelected, setSelectedCreatureId as dbSetSelected, getCreatureProsody as dbGetProsody } from './db';
+import { getCreatureWithAnimations, getWords as dbGetWords, setCreatureWords as dbSetCreatureWords, getSelectedCreatureId as dbGetSelected, setSelectedCreatureId as dbSetSelected, getCreatureProsody as dbGetProsody, getCurrentEmotion as dbGetCurrentEmotion, setCurrentEmotion as dbSetCurrentEmotion } from './db';
 
 // Returns { id, name, imageKey, image } for given creature id
 // image is the require(...) source for neutral_mouth_closed
@@ -46,4 +46,12 @@ export async function getEffectiveProsody(creatureId, emotion) {
   };
 }
 
-export default { getCreatureNameAndNeutralClosed, getWords, setWords, getSelectedCreatureId, setSelectedCreatureId, getProsody, getEffectiveProsody };
+export async function getCurrentEmotion() {
+  return dbGetCurrentEmotion();
+}
+
+export async function setCurrentEmotion(emotion) {
+  return dbSetCurrentEmotion(emotion);
+}
+
+export default { getCreatureNameAndNeutralClosed, getWords, setWords, getSelectedCreatureId, setSelectedCreatureId, getProsody, getEffectiveProsody, getCurrentEmotion, setCurrentEmotion };

@@ -27,7 +27,17 @@ async function ensureProsodyColumn(db) {
 export async function initializeDatabase() {
   const db = await getDb();
   await db.withTransactionAsync(async () => {
+
+
+    // Drop existing tables for a fresh seed each start while developing
+    await db.execAsync('PRAGMA foreign_keys = OFF;');
+    await db.runAsync('DROP TABLE IF EXISTS animations;');
+    await db.runAsync('DROP TABLE IF EXISTS selected_creature;');
+    await db.runAsync('DROP TABLE IF EXISTS speech_state;');
+    await db.runAsync('DROP TABLE IF EXISTS creatures;');
     await db.execAsync('PRAGMA foreign_keys = ON;');
+
+
     await db.runAsync(`CREATE TABLE IF NOT EXISTS creatures (
       id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL UNIQUE,
@@ -49,12 +59,19 @@ export async function initializeDatabase() {
       happy_mouth_closed TEXT,
       calm_mouth_open TEXT,
       calm_mouth_closed TEXT,
+      angry_mouth_open TEXT,
+      angry_mouth_closed TEXT,
       FOREIGN KEY (creature_id) REFERENCES creatures(id) ON DELETE CASCADE
     );`);
     await db.runAsync(`CREATE TABLE IF NOT EXISTS selected_creature (
       id INTEGER PRIMARY KEY CHECK (id = 1),
       creature_id INTEGER,
       FOREIGN KEY (creature_id) REFERENCES creatures(id) ON DELETE SET NULL
+    );`);
+
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS speech_state (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      emotion TEXT
     );`);
   });
 }
@@ -80,6 +97,8 @@ export async function insertAnimations(creatureId, images) {
     'happy_mouth_closed',
     'calm_mouth_open',
     'calm_mouth_closed',
+    'angry_mouth_open',
+    'angry_mouth_closed',
   ];
   const values = cols.map((k) => images?.[k] ?? null);
 
@@ -130,6 +149,17 @@ export async function getWords(creatureId) {
   await ensureWordsColumn(db);
   const row = await db.getFirstAsync('SELECT words_json FROM creatures WHERE id = ?;', [creatureId]);
   return row?.words_json ? JSON.parse(row.words_json) : [];
+}
+
+export async function setCurrentEmotion(emotion) {
+  const db = await getDb();
+  await db.runAsync(`INSERT OR REPLACE INTO speech_state (id, emotion) VALUES (1, ?);`, [emotion ?? null]);
+}
+
+export async function getCurrentEmotion() {
+  const db = await getDb();
+  const row = await db.getFirstAsync('SELECT emotion FROM speech_state WHERE id = 1;');
+  return row?.emotion ?? null;
 }
 
 export async function setCreatureProsody(creatureId, prosodyMap) {
