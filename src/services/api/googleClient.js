@@ -63,7 +63,6 @@ export async function analyzeTextGemini(userText, apiKey = extra.GOOGLE_API_KEY,
   const parsed = extractJsonFromText(text || '');
   if (!parsed) {
     try {
-      // Log raw response in dev to help diagnose
       if (typeof __DEV__ !== 'undefined' ? __DEV__ : true) {
         console.warn('Gemini unexpected response', { data, text });
       }
@@ -80,3 +79,4 @@ export async function analyzeTextGemini(userText, apiKey = extra.GOOGLE_API_KEY,
 }
 
 export default { analyzeTextGemini };
+
