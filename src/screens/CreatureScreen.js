@@ -1,38 +1,117 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {analyzeText} from "../services/api/polinationsClient";
 
 export default function CreatureScreen({ navigation }) {
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.headerBtn}>
-          <Text style={styles.headerBtnText}>Home</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.title}>Creature</Text>
-    </View>
-  );
+    const [text, onChangeText] = useState('');
+
+    const handleSend = async () => {
+        if (text.trim()) {
+            console.log('Gesendet:', text);
+            try {
+                const result = await analyzeText(text);
+                console.log('Antwort von Pollinations:', result);
+            } catch (error) {
+                console.error('Fehler:', error);
+            }
+            onChangeText('');
+        }
+    };
+
+    return (
+        <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.headerBtn}>
+                        <Text style={styles.headerBtnText}>Home</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.content}>
+                    <Text style={styles.title}>Hier kommen die Creatures...</Text>
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={onChangeText}
+                        value={text}
+                        placeholder="Gib etwas ein..."
+                    />
+                    <TouchableOpacity
+                        style={styles.sendButton}
+                        onPress={handleSend}
+                    >
+                        <Text style={styles.sendButtonText}>➤</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 48,
-    paddingHorizontal: 16,
-  },
-  header: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-  },
-  headerBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#2f80ed',
-    borderRadius: 8,
-  },
-  headerBtnText: { color: '#fff', fontWeight: '600' },
-  title: { fontSize: 28, fontWeight: '600', marginTop: 40 },
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    container: {
+        flex: 1,
+    },
+    content: {
+        flex: 1,
+        paddingTop: 40,
+        paddingHorizontal: 16,
+    },
+    header: {
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        zIndex: 10,
+    },
+    headerBtn: {
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#000',
+    },
+    headerBtnText: {
+        color: '#111',
+        fontWeight: '600',
+        fontSize: 18,
+        textAlign: 'center',
+    },
+    title: { fontSize: 28, fontWeight: '600', marginTop: 40 },
+    inputContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingBottom: 20,
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    input: {
+        flex: 1,
+        height: 40,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 10,
+        marginRight: 8,
+    },
+    sendButton: {
+        width: 40,
+        height: 40,
+        backgroundColor: 'grey',
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    sendButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '600',
+    },
 });
-
