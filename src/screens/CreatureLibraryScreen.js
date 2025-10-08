@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import buttonStyles from '../styles/buttons';
@@ -67,7 +67,7 @@ export default function CreatureLibraryScreen({ navigation }) {
               isSelected && styles.selectBtnSelectedText,
             ]}
           >
-            {isSelected ? 'Ausgewaehlt' : 'Auswaehlen'}
+            {isSelected ? 'Ausgewählt' : 'Auswählen'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -78,11 +78,17 @@ export default function CreatureLibraryScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')} style={buttonStyles.button}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Home')}
+            style={[buttonStyles.button, buttonStyles.buttonFlex, buttonStyles.buttonLeft]}
+          >
             <Text style={buttonStyles.buttonText}>Home</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={buttonStyles.button}>
-            <Text style={buttonStyles.buttonText}>Zurueck</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Home')}
+            style={[buttonStyles.button, buttonStyles.buttonFlex, buttonStyles.buttonRight]}
+          >
+            <Text style={buttonStyles.buttonText}>Zurück</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.title}>Creature Library</Text>
@@ -116,7 +122,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 24,
   },
   title: { fontSize: 28, fontWeight: '600', marginBottom: 12 },

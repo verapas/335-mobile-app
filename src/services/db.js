@@ -24,28 +24,28 @@ async function ensureProsodyColumn(db) {
   }
 }
 
+async function ensureTtsLanguageColumn(db) {
+  const cols = await db.getAllAsync(`PRAGMA table_info(creatures);`);
+  const has = cols?.some?.((c) => c?.name === 'tts_language');
+  if (!has) {
+    await db.runAsync(`ALTER TABLE creatures ADD COLUMN tts_language TEXT;`);
+  }
+}
+
 export async function initializeDatabase() {
   const db = await getDb();
   await db.withTransactionAsync(async () => {
-
-
-    // Drop existing tables for a fresh seed each start while developing
-    await db.execAsync('PRAGMA foreign_keys = OFF;');
-    await db.runAsync('DROP TABLE IF EXISTS animations;');
-    await db.runAsync('DROP TABLE IF EXISTS selected_creature;');
-    await db.runAsync('DROP TABLE IF EXISTS speech_state;');
-    await db.runAsync('DROP TABLE IF EXISTS creatures;');
-    await db.execAsync('PRAGMA foreign_keys = ON;');
-
-
+    // Create tables if they don't exist; keep existing data intact
     await db.runAsync(`CREATE TABLE IF NOT EXISTS creatures (
       id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL UNIQUE,
       prosody_pitch INTEGER,
-      prosody_rate INTEGER
+      prosody_rate INTEGER,
+      tts_language TEXT
     );`);
     await ensureWordsColumn(db);
     await ensureProsodyColumn(db);
+    await ensureTtsLanguageColumn(db);
     await db.runAsync(`CREATE TABLE IF NOT EXISTS animations (
       id INTEGER PRIMARY KEY NOT NULL,
       creature_id INTEGER UNIQUE,
@@ -76,12 +76,12 @@ export async function initializeDatabase() {
   });
 }
 
-export async function insertCreature({ id, name, prosody_pitch, prosody_rate }) {
+export async function insertCreature({ id, name, prosody_pitch, prosody_rate, tts_language }) {
   const db = await getDb();
   await db.runAsync(
-    `INSERT OR IGNORE INTO creatures (id, name, prosody_pitch, prosody_rate)
-     VALUES (?, ?, ?, ?);`,
-    [id ?? null, name, prosody_pitch ?? null, prosody_rate ?? null]
+    `INSERT OR IGNORE INTO creatures (id, name, prosody_pitch, prosody_rate, tts_language)
+     VALUES (?, ?, ?, ?, ?);`,
+    [id ?? null, name, prosody_pitch ?? null, prosody_rate ?? null, tts_language ?? null]
   );
 }
 

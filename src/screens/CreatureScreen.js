@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, KeyboardAvo
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { analyzeTextGemini } from '../services/api/googleClient';
-import { getSelectedCreatureId, getEffectiveProsody, setCurrentEmotion } from '../services/creatureService';
+import { getSelectedCreatureId, getEffectiveProsody, setCurrentEmotion, getTtsLanguage } from '../services/creatureService';
 import { getCreatureWithAnimations, getCreatures } from '../services/db';
 import images from '../assets/registry/creatureImages';
 import { speakText, isSpeaking, stop as stopTTS } from '../services/audio/tts';
+import { startShakeDetection, triggerCreatureReaction } from '../services/sensors/shake';
 import { generateText } from '../services/textGenerator';
 
 export default function CreatureScreen({ navigation }) {
@@ -55,6 +56,13 @@ export default function CreatureScreen({ navigation }) {
         return () => { mounted = false; clearInterval(interval); };
     }, []);
 
+    useEffect(() => {
+        const sub = startShakeDetection(() => {
+            try { triggerCreatureReaction({ setEmotion }); } catch {}
+        });
+        return () => { try { sub && sub.stop && sub.stop(); } catch {} };
+    }, []);
+
     const currentImage = useMemo(() => {
         if (!anim) return null;
         const pickKey = (key) => (key && images[key]) ? images[key] : null;
@@ -90,6 +98,7 @@ export default function CreatureScreen({ navigation }) {
 
                 try {
                     const { pitch, rate } = await getEffectiveProsody(creatureId, result.emotion);
+                    const language = await getTtsLanguage(creatureId);
                     if (await isSpeaking()) {
                         stopTTS();
                     }
@@ -99,7 +108,7 @@ export default function CreatureScreen({ navigation }) {
                         text: out,
                         pitch,
                         rate,
-                        language: 'de-DE',
+                        language,
                         onStart: () => { setSpeaking(true); setMouthOpen(true); },
                         onDone: async () => {
                             try { await setCurrentEmotion(null); } catch {}

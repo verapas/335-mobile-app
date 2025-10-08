@@ -46,6 +46,12 @@ export async function getEffectiveProsody(creatureId, emotion) {
   };
 }
 
+export async function getTtsLanguage(creatureId) {
+  const data = await getCreatureWithAnimations(creatureId);
+  const lang = data?.creature?.tts_language;
+  return typeof lang === 'string' && lang ? lang : 'de-DE';
+}
+
 export async function getCurrentEmotion() {
   return dbGetCurrentEmotion();
 }
@@ -54,4 +60,4 @@ export async function setCurrentEmotion(emotion) {
   return dbSetCurrentEmotion(emotion);
 }
 
-export default { getCreatureNameAndNeutralClosed, getWords, setWords, getSelectedCreatureId, setSelectedCreatureId, getProsody, getEffectiveProsody, getCurrentEmotion, setCurrentEmotion };
+export default { getCreatureNameAndNeutralClosed, getWords, setWords, getSelectedCreatureId, setSelectedCreatureId, getProsody, getEffectiveProsody, getCurrentEmotion, setCurrentEmotion, getTtsLanguage };
