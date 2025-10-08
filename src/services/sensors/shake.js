@@ -35,7 +35,7 @@ export function startShakeDetection(onShake, {
   };
 }
 
-export async function triggerCreatureReaction({ setEmotion, text = 'uuuuii', pitch = 1.8, rate = 1.15 } = {}) {
+export async function triggerCreatureReaction({ setEmotion, text = 'ohoho', pitch = 1.8, rate = 1.15 } = {}) {
   try {
     if (await isSpeaking()) {
       try { stopTTS(); } catch {}
