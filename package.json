@@ -7,7 +7,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@react-navigation/native": "^7.1.18",
@@ -24,5 +26,29 @@
     "react-native-screens": "~4.16.0",
     "react-native-web": "^0.21.0"
   },
-  "private": true
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-native/extend-expect"
+    ],
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/e2e/"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native|@react-navigation|@react-native-community|expo(nent)?|@expo(nent)?/.*|expo-.*|react-native-svg|@unimodules/.*|unimodules-.*|sentry-expo|native-base|react-native-safe-area-context|@react-native-async-storage/async-storage).*)"
+    ],
+    "moduleNameMapper": {
+      "^expo($|/.+)": "<rootDir>/__mocks__/expo.js",
+      "^expo-constants$": "<rootDir>/__mocks__/expo-constants.js",
+      "\\.(png|jpg|jpeg|gif|svg)$": "<rootDir>/__mocks__/fileMock.js"
+    }
+  },
+  "private": true,
+  "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
+    "jest": "^29.7.0",
+    "jest-expo": "^54.0.12"
+  }
 }
