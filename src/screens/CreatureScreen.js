@@ -76,13 +76,10 @@ export default function CreatureScreen({ navigation }) {
     }, [anim, speaking, mouthOpen, emotion]);
 
 
-    // aktuell nur zum testen der ausgaben
     const handleSend = async () => {
         if (text.trim()) {
-            console.log('Gesendet:', text);
             try {
                 const result = await analyzeTextGemini(text);
-                console.log('Antwort von Gemini:', result);
 
                 let creatureId = await getSelectedCreatureId();
                 if (!creatureId) {
@@ -94,7 +91,6 @@ export default function CreatureScreen({ navigation }) {
                     duration: result.duration,
                 });
                 setGenerated(out);
-                console.log('Generated text:', out);
 
                 try {
                     const { pitch, rate } = await getEffectiveProsody(creatureId, result.emotion);
@@ -124,12 +120,6 @@ export default function CreatureScreen({ navigation }) {
                 }
             } catch (error) {
                 console.error('Gemini error:', error);
-                try {
-                    if (error && (error.raw || error.text)) {
-                        console.log('Gemini raw response:', error.raw);
-                        console.log('Gemini response text:', error.text);
-                    }
-                } catch {}
             }
             onChangeText('');
         }

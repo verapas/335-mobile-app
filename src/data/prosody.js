@@ -21,9 +21,9 @@ const prosody = [
       neutral: { pitch: 0.05 + j(), rate: 0.05 + j() },
       happy: { pitch: 0.25 + j(), rate: 0.30 + j() },
       sad: { pitch: -0.15 + j(), rate: -0.20 + j() },
-      excited: { pitch: 0.35 + j(), rate: 0.45 + j() },
+      excited: { pitch: 0.35 + j(), rate: 0.25 + j() },
       calm: { pitch: -0.05 + j(), rate: -0.05 + j() },
-      angry: { pitch: 0.00 + j(), rate: 0.30 + j() },
+      angry: { pitch: 0.00 + j(), rate: 0.20 + j() },
     },
   },
 ];

@@ -13,10 +13,10 @@ const words = [
     creature_id: 2,
     words: [
       'Loo','Baa','mush','fooshi','saashy','balanee','puffo','wooble','bloo','squee',
-      'boonie','floofy','mellow','nibble','twizzle','snoodle','whoa','bubboo','swishy','glimmer',
+      'boonie','cronc','swon','nibble','twizzle','snoodle','whoa','bubboo','swishy','glimmer',
       'pillow','swoony','jello','smooshy','buzzy','wobbly','sugar','poppy','jolly','snuggle',
-      'loopy','squishy','puffy','fizzy','breezy','soggy','honey','goody','bubble','sprout',
-      'mellowee','baloo','banini','loonie','zaa','boo','bubba','floo','foom','muu'
+      'I','squishy','zupp','fizzy','breezy','soggy','swoon','goody','rub','sprout',
+      'mellowee','ma','banini','loonie','zaa','boo','bubba','floo','foom','muu'
     ],
   },
 ];
