@@ -12,13 +12,13 @@ export default function InfoScreen({ navigation }) {
                         onPress={() => navigation.navigate('Home')}
                         style={[buttonStyles.button, buttonStyles.buttonFlex, buttonStyles.buttonLeft]}
                     >
-                        <Text style={buttonStyles.buttonText}>Zurück</Text>
+                        <Text style={buttonStyles.buttonText}>Home</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('Home')}
+                        onPress={() => navigation.navigate('Creature')}
                         style={[buttonStyles.button, buttonStyles.buttonFlex, buttonStyles.buttonRight]}
                     >
-                        <Text style={buttonStyles.buttonText}>Home</Text>
+                        <Text style={buttonStyles.buttonText}>Start</Text>
                     </TouchableOpacity>
                 </View>
 

@@ -85,10 +85,10 @@ export default function CreatureLibraryScreen({ navigation }) {
             <Text style={buttonStyles.buttonText}>Home</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Home')}
+            onPress={() => navigation.navigate('Creature')}
             style={[buttonStyles.button, buttonStyles.buttonFlex, buttonStyles.buttonRight]}
           >
-            <Text style={buttonStyles.buttonText}>Zurück</Text>
+            <Text style={buttonStyles.buttonText}>Start</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.title}>Creature Library</Text>
