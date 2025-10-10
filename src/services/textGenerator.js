@@ -101,8 +101,7 @@ export async function generateText({ creatureId, emotion, duration }) {
     parts.push(w + (sep ? sep : ''));
   }
 
-  // Join with spaces taking into account we already appended separators
-  const body = parts.join(' ').replace(/\s+([,?])/g, '$1'); // tidy spaces before punctuation
+  const body = parts.join(' ').replace(/\s+([,?])/g, '$1');
   const endPunc = chooseEndPunctuation(emotion);
   const text = `${body}${endPunc}`;
   return text;
